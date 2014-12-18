@@ -79,8 +79,8 @@ interface MediaTrackConstraints {
 }
 
 interface MediaStreamConstraints {
-  video: any; // boolean | MediaTrackConstraints;
-  audio: any; // boolean | MediaTrackConstraints;
+  video?: any; // boolean | MediaTrackConstraints;
+  audio?: any; // boolean | MediaTrackConstraints;
 }
 
 

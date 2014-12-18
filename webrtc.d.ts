@@ -13,9 +13,51 @@ declare enum RTCSdpType {
   "answer"
 }
 
+declare enum RTCSignalingState {
+  "stable",
+  "have-local-offer",
+  "have-remote-offer",
+  "have-local-pranswer",
+  "have-remote-pranswer",
+  "closed"
+}
+
+
+declare enum RTCIceGatheringState {
+  "new",
+  "gathering",
+  "complete"
+}
+
+
+declare enum RTCIceConnectionState {
+  "new",
+  "checking",
+  "connected",
+  "completed",
+  "failed",
+  "disconnected",
+  "closed"
+}
+
+
+interface MediaStreamEventInit {
+  stream: MediaStream;
+}
+
+interface MediaStreamEvent extends Event {
+  constructor(type: string, eventInitDict: MediaStreamEventInit);
+  stream: MediaStream;
+}
+
+
+interface VoidFunction {
+  (): void;
+}
+
 
 interface RTCSessionDescriptionInit {
-  type: RTCSdpType ;
+  type: string; //RTCSdpType;
   sdp: string;
 }
 
@@ -32,6 +74,10 @@ interface RTCSessionDescriptionCallback {
   (sdp: RTCSessionDescription): void;
 }
 
+interface RTCPeerConnectionErrorCallback {
+  (error: Error): void;
+}
+
 
 interface RTCIceServer {
   urls: any; // (DOMString or sequence<DOMString>)
@@ -45,6 +91,26 @@ interface RTCConfiguration {
 }
 
 
+interface MediaConstraints {
+  mandatory?: any;
+  optional?: any;
+}
+
+
+interface RTCIceCandidateInit {
+  candidate?: string;
+  sdpMid?: string;
+  sdpMLineIndex?: number;
+}
+
+declare class RTCIceCandidate {
+  constructor(candidateInitDict: RTCIceCandidateInit);
+  candidate     : string;
+  sdpMid        : string;
+  sdpMLineIndex : number;
+}
+
+
 declare class RTCPeerConnection {
   constructor(configuration: RTCConfiguration,
               constraints?: MediaConstraints);
@@ -54,13 +120,13 @@ declare class RTCPeerConnection {
               constraints?: MediaConstraints): void;
   createAnswer(successCallback: RTCSessionDescriptionCallback,
                failureCallback?: RTCPeerConnectionErrorCallback,
-               constraints?: RTCMediaConstraints): void;
+               constraints?: MediaConstraints): void;
   setLocalDescription(description: RTCSessionDescription,
-                      successCallback?: RTCVoidCallback,
+                      successCallback?: VoidFunction,
                       failureCallback?: RTCPeerConnectionErrorCallback): void;
   localDescription: RTCSessionDescription;
   setRemoteDescription(description: RTCSessionDescription,
-                       successCallback?: RTCVoidCallback,
+                       successCallback?: VoidFunction,
                        failureCallback?: RTCPeerConnectionErrorCallback): void;
   remoteDescription: RTCSessionDescription;
   signalingState: RTCSignalingState;
@@ -68,7 +134,7 @@ declare class RTCPeerConnection {
             constraints?: MediaConstraints): void;
   addIceCandidate(candidate: RTCIceCandidate): void;
   iceGatheringState: RTCIceGatheringState;
-  iceConnectionState: RTCIceConnectionState;
+  iceConnectionState: string;       //RTCIceConnectionState;
   getLocalStreams(): MediaStream[];
   getRemoteStreams(): MediaStream[];
   getStreamById(streamId: string): MediaStream;
@@ -78,7 +144,7 @@ declare class RTCPeerConnection {
   onnegotiationneeded: (event: Event) => void;
   onicecandidate: (event: Event) => void;
   onsignalingstatechange: (event: Event) => void;
-  onaddstream: (event: Event) => void;
-  onremovestream: (event: Event) => void;
+  onaddstream: (event: MediaStreamEvent) => void;
+  onremovestream: (event: MediaStreamEvent) => void;
   oniceconnectionstatechange: (event: Event) => void;
 }
